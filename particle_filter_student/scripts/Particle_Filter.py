@@ -7,7 +7,7 @@ import math
 
 class Particle_Filter:
 
-    NB_PARTICLES=200
+    NB_PARTICLES=50
     FIXED_PLANE_Y = 100
     increment = 0
     DISTANCE_ERROR = 2
@@ -40,7 +40,7 @@ class Particle_Filter:
         particle_list = []
         ###################################
         ##### TODO
-        ##   nbr: number fo particles
+        ##   nbr: number of particles
         ##   start_x: min x possible coordinate
         ##   max_x: max x possible coordinate
         ##   start_y: min y possible coordinate
@@ -48,6 +48,12 @@ class Particle_Filter:
         #####
         ## Use the Particle object to fill the list particle_list
         ##
+        #particle_list = [[0 for _ in range(start_x, max_x + 1)] for _ in range(start_y, max_y + 1)]
+        for _ in range(nbr):
+            rand_x = random.randint(start_x, max_x)
+            rand_y = random.randint(start_y, max_y)
+            particle = Particle(rand_x, self.FIXED_PLANE_Y, 1, 1)
+            particle_list.append(particle)
 
         return particle_list
 
@@ -60,7 +66,7 @@ class Particle_Filter:
 
         current_distance_to_obstacle = distance_to_obstacle(plane_pose['x'], plane_pose['y'], self.obs_grid,self.width,self.height,self.SCALE_FACTOR)
 
-        self.weightingParticle_list( current_distance_to_obstacle)
+        self.weightingParticle_list(current_distance_to_obstacle)
 
 
         # ----------------------------------------------------------------------------------------------------------------
@@ -84,6 +90,14 @@ class Particle_Filter:
             #   coord = self.weighted_random_choice(choices)
             #   x_coord = int(coord.split('_')[0])
             #   y_coord = int(coord.split('_')[1])
+        for i in range(self.NB_PARTICLES):
+            coord = self.weighted_random_choice(choices)
+            x_coord = int(coord.split('_')[0])
+            y_coord = int(coord.split('_')[1])
+        
+            rand_movement = 1 + self.increment + round(random.gauss(0, 1))
+            new_particle = Particle(x_coord + rand_movement, y_coord, 1, 1)
+            new_particle_list.append(new_particle)
 
         return new_particle_list
 
@@ -97,7 +111,14 @@ class Particle_Filter:
         ##  and weight as value
         ##  return the selected particle key
         #####
-        return ""
+        weighted_list = []
+
+        for particle in choices.keys():
+            for _ in range(round(choices[particle] * 100)):
+                weighted_list.append(particle)
+        random_choice = random.choice(weighted_list)
+
+        return random_choice
 
     # ----------------------------------------------------------------------------------------------------------------
     # --------------------------------------------- EVALUATE PARTICLE (proba) ---------------------------------------
@@ -133,4 +154,6 @@ class Particle_Filter:
         ##
         ## Note ue the function distance_to_obstacle to get the
         ## estimate particle to the ground distance
-        return ""
+        particle_distance = distance_to_obstacle(p_x, p_y, self.obs_grid, self.width, self.height, self.SCALE_FACTOR)
+        weight = 1/(1 + 5* abs(particle_distance - observed_distance))
+        return weight
