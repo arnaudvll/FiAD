@@ -7,10 +7,10 @@ import math
 
 class Particle_Filter:
 
-    NB_PARTICLES=50
+    NB_PARTICLES=200
     FIXED_PLANE_Y = 100
     increment = 0
-    DISTANCE_ERROR = 2
+    DISTANCE_ERROR = random.randint(1, 4)
 
     width=0
     height=0
@@ -28,7 +28,7 @@ class Particle_Filter:
         self.width=width
         self.height=height
         self.obs_grid=obs_grid
-        self.particle_list=self.getRandParticle(self.NB_PARTICLES,0,width,self.FIXED_PLANE_Y,self.FIXED_PLANE_Y)
+        self.particle_list=self.getRandParticle(self.NB_PARTICLES, 0, width, self.FIXED_PLANE_Y, self.FIXED_PLANE_Y)
 
     def resetParticle(self):
         self.particle_list = self.getRandParticle(self.NB_PARTICLES, 0, self.width, self.FIXED_PLANE_Y, self.FIXED_PLANE_Y)
@@ -52,7 +52,11 @@ class Particle_Filter:
         for _ in range(nbr):
             rand_x = random.randint(start_x, max_x)
             rand_y = random.randint(start_y, max_y)
-            particle = Particle(rand_x, self.FIXED_PLANE_Y, 1, 1)
+
+            weight = random.random()
+            proba = random.random()
+
+            particle = Particle(rand_x, self.FIXED_PLANE_Y, weight, proba)
             particle_list.append(particle)
 
         return particle_list
@@ -95,7 +99,7 @@ class Particle_Filter:
             x_coord = int(coord.split('_')[0])
             y_coord = int(coord.split('_')[1])
         
-            rand_movement = 1 + self.increment + round(random.gauss(0, 1))
+            rand_movement = 1 + self.increment + round(random.gauss(0, 4))
             new_particle = Particle(x_coord + rand_movement, y_coord, 1, 1)
             new_particle_list.append(new_particle)
 
@@ -155,5 +159,6 @@ class Particle_Filter:
         ## Note ue the function distance_to_obstacle to get the
         ## estimate particle to the ground distance
         particle_distance = distance_to_obstacle(p_x, p_y, self.obs_grid, self.width, self.height, self.SCALE_FACTOR)
-        weight = 1/(1 + 5* abs(particle_distance - observed_distance))
+        weight = 1/(1 +  0.5 * (particle_distance - observed_distance)**2 / self.DISTANCE_ERROR)
+        
         return weight
