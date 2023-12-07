@@ -117,6 +117,11 @@ class PlaneSimulation:
                     elif event.key == pygame.K_KP_MINUS:
                         if self.particleFilter.increment > -1:
                             self.particleFilter.increment -= 1
+                    elif event.key == pygame.K_UP:
+                        plane_pose['y'] = plane_pose['y'] - 10
+                    elif event.key == pygame.K_DOWN:
+                        plane_pose['y'] = plane_pose['y'] + 10
+
 
 
                 # handle MOUSEBUTTONUP

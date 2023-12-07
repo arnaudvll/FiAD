@@ -10,7 +10,7 @@ class Particle_Filter:
     NB_PARTICLES=200
     FIXED_PLANE_Y = 100
     increment = 0
-    DISTANCE_ERROR = random.randint(1, 4)
+    DISTANCE_ERROR = random.randint(1,30)
 
     width=0
     height=0
@@ -28,10 +28,10 @@ class Particle_Filter:
         self.width=width
         self.height=height
         self.obs_grid=obs_grid
-        self.particle_list=self.getRandParticle(self.NB_PARTICLES, 0, width, self.FIXED_PLANE_Y, self.FIXED_PLANE_Y)
+        self.particle_list=self.getRandParticle(self.NB_PARTICLES, 0, width, 0, height)
 
     def resetParticle(self):
-        self.particle_list = self.getRandParticle(self.NB_PARTICLES, 0, self.width, self.FIXED_PLANE_Y, self.FIXED_PLANE_Y)
+        self.particle_list = self.getRandParticle(self.NB_PARTICLES, 0, self.width, 0, self.height)
 
         # ----------------------------------------------------------------------------------------------------------------
         # ----------------------------------------- COMPUTED RANDOM PARTICLES--------------------------------------------
@@ -56,7 +56,7 @@ class Particle_Filter:
             weight = random.random()
             proba = random.random()
 
-            particle = Particle(rand_x, self.FIXED_PLANE_Y, weight, proba)
+            particle = Particle(rand_x, rand_y, weight, proba)
             particle_list.append(particle)
 
         return particle_list
@@ -98,9 +98,12 @@ class Particle_Filter:
             coord = self.weighted_random_choice(choices)
             x_coord = int(coord.split('_')[0])
             y_coord = int(coord.split('_')[1])
+            weight = choices[coord]
         
-            rand_movement = 1 + self.increment + round(random.gauss(0, 4))
-            new_particle = Particle(x_coord + rand_movement, y_coord, 1, 1)
+            rand_movement_x = 1 + self.increment + round(random.gauss(0, self.width/120))
+            rand_movement_y = round(random.gauss(0, self.height/150))
+
+            new_particle = Particle(x_coord + rand_movement_x, y_coord + rand_movement_y, weight, 1)
             new_particle_list.append(new_particle)
 
         return new_particle_list
@@ -131,7 +134,7 @@ class Particle_Filter:
         sum_weights = 0
         for i in range(len(self.particle_list)):
             #Compute individual particle weight
-            current_weight = self.weightingParticle(self.particle_list[i].x,  self.FIXED_PLANE_Y+50, observed_distance)
+            current_weight = self.weightingParticle(self.particle_list[i].x,  self.particle_list[i].y, observed_distance)
             self.particle_list[i].w = current_weight
             sum_weights += current_weight
         for i in range(len(self.particle_list)):
@@ -160,5 +163,5 @@ class Particle_Filter:
         ## estimate particle to the ground distance
         particle_distance = distance_to_obstacle(p_x, p_y, self.obs_grid, self.width, self.height, self.SCALE_FACTOR)
         weight = 1/(1 +  0.5 * (particle_distance - observed_distance)**2 / self.DISTANCE_ERROR)
-        
+
         return weight
