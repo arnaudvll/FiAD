@@ -210,15 +210,22 @@ jH =[1 0 0 0
     0 0 0 1];
 
 function u = doControl(time)
-%Calc Input Parameter
+    %Calc Input Parameter
+    % [V yawrate]
 
+    % very simple constant control over time example 
+    V=1.0; % [m/s]
+    yawrate = 0; % 5 [deg/s]
+
+    t_mod = mod(time, 5); % Temps modulé pour une période complète du carré
  
-% [V yawrate]
+    % Calculer la commande en fonction du temps modulé pour suivre le carré
+    if t_mod <= 1 % Avancer vers le haut
+        V = 0;
+        yawrate = 90; % Avancer en ligne droite
+    end
 
-% very simple constant control over time example 
-V=1.0; % [m/s]
-yawrate = 5; % 5 [deg/s]
-u =[ V toRadian(yawrate)]';
+    u =[ V toRadian(yawrate)]';
  
 
 function [z, x, xd, un] = Observation(x, xd, u)
