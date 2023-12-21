@@ -215,15 +215,15 @@ function u = doControl(time)
 
     % very simple constant control over time example 
     V=1.0; % [m/s]
-    yawrate = 0; % 5 [deg/s]
+    yawrate = 5; % 5 [deg/s]
 
-    t_mod = mod(time, 5); % Temps modulé pour une période complète du carré
+    t_mod = mod(time, 15); % Temps modulé pour une période complète du carré
  
     % Calculer la commande en fonction du temps modulé pour suivre le carré
-    if t_mod <= 1 % Avancer vers le haut
-        V = 0;
-        yawrate = 90; % Avancer en ligne droite
-    end
+%     if t_mod <= 1 % Toutes les 10 secondes
+%         V = 0;
+%         yawrate = 90; % Tourner en angle droit (90 deg/s pendant 1 sec)
+%     end
 
     u =[ V toRadian(yawrate)]';
  
@@ -265,17 +265,17 @@ plot(result.xd(:,1), result.xd(:,2),'--k','linewidth', 4); hold on;
 title('EKF Localization Result', 'fontsize', 16, 'fontname', 'times');
 xlabel('X (m)', 'fontsize', 16, 'fontname', 'times');
 ylabel('Y (m)', 'fontsize', 16, 'fontname', 'times');
-%legend('GPS','Ground Truth','Dead Reckoning','EKF','Error Ellipse');
+legend('GPS','Ground Truth','Dead Reckoning','EKF','Error Ellipse');
 grid on;
 axis equal;
-plot(x(:,3), x(:,4),'r','linewidth', 2);
-%figure(2)
+% plot(x(:,3), x(:,4),'r','linewidth', 2);
+figure(2)
 
-% plot(result.time,result.xTrue(:,1),'-.b','linewidth', 2);hold on;
-% plot(result.time,result.xEst(:,1),'r','linewidth', 2);hold on;
-% plot(result.time,result.xd(:,1),'--k','linewidth', 2);hold on;
-% plot(result.time,result.z(:,1),'d','MarkerSize',10);hold on;
-% title('EKF Localization Result X', 'fontsize', 16, 'fontname', 'times');
+plot(result.time,result.xTrue(:,1),'-.b','linewidth', 2);hold on;
+plot(result.time,result.xEst(:,1),'r','linewidth', 2);hold on;
+plot(result.time,result.xd(:,1),'--k','linewidth', 2);hold on;
+plot(result.time,result.z(:,1),'d','MarkerSize',10);hold on;
+title('EKF Localization Result X', 'fontsize', 16, 'fontname', 'times');
 % figure(3)
 % plot(result.time,result.xTrue(:,2),'-.b','linewidth', 2);hold on;
 % plot(result.time,result.xEst(:,2),'r','linewidth', 2);hold on;
@@ -289,18 +289,19 @@ plot(x(:,3), x(:,4),'r','linewidth', 2);
 % figure(5)
 % plot(result.time,result.odomError(:,2),'*','MarkerSize',10);hold on;
 % title('Odometry error over time thetha', 'fontsize', 16, 'fontname', 'times');
-% figure(6)
-% plot(result.odomError(:,1),result.odomError(:,2),'*','MarkerSize',10);hold on;
-% title('Odometry R and thetha', 'fontsize', 16, 'fontname', 'times');
-% figure(7)
-% plot(result.measurmentError(:,1),result.measurmentError(:,2),'*','MarkerSize',10);hold on;
-% title('Mesarumeny Error X and Y', 'fontsize', 16, 'fontname', 'times');
+figure(6)
+plot(result.odomError(:,1),result.odomError(:,2),'*','MarkerSize',10);hold on;
+title('Odometry R and thetha', 'fontsize', 16, 'fontname', 'times');
+figure(7)
+plot(result.measurmentError(:,1),result.measurmentError(:,2),'*','MarkerSize',10);hold on;
+title('Mesarumeny Error X and Y', 'fontsize', 16, 'fontname', 'times');
 % figure(8)
 % plot(result.time,[(result.xTrue(:,1:2)-result.xd(:,1:2)) (result.xTrue(:,1:2)-result.xEst(:,1:2)) (result.xTrue(:,1:2)-result.z(:,1:2)) ],'*','MarkerSize',10);hold on;
-% 
+% legend('Odometry Error X','Odometry Error Y','Kalman Error X','Kalman Error Y','GPS Error X', 'GPS Error Y');
 % title('Absolut Error X and Y', 'fontsize', 16, 'fontname', 'times');
 % figure(9)
 % plot(result.time,[(result.xTrue(:,1:2)-result.xEst(:,1:2)) (result.xTrue(:,1:2)-result.xsf(:,1:2))],'*','MarkerSize',10);hold on;
+% legend('Kalman Filter Error X','Kalman Filter Error Y','Simple Filter Error X','Simple Filter Error Y');
 % 
 % title('Simple Filter vs Kalman Filter Absolut Error X and Y', 'fontsize', 16, 'fontname', 'times');
 
